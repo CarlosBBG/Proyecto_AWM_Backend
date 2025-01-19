@@ -1,0 +1,35 @@
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/sequelize.config');
+const Ruta = require('./ruta.model');
+
+const Parada = sequelize.define('Parada', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    nombre: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    ruta: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
+    }, {
+    tableName: 'paradas',
+    timestamps: false
+});
+
+Ruta.hasMany(Parada, {
+    foreignKey: 'ruta',
+    as: 'paradas'
+});
+
+Parada.belongsTo(Ruta, {
+    foreignKey: 'ruta',
+    as: 'rutaData'
+});
+
+module.exports = Parada;
+

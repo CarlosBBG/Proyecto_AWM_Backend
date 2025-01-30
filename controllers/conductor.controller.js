@@ -97,7 +97,7 @@ module.exports.getParadasConductor = async (req, res) => {
                         {
                             model: Parada,
                             as: 'paradas', // Asegúrate de que este alias coincida con la asociación en tu modelo
-                            attributes: ['id', 'nombre'] // Solo devuelve campos relevantes
+                            attributes: ['id', 'nombre', 'longitud', 'latitud'] // Solo devuelve campos relevantes
                         }
                     ]
                 }

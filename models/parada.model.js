@@ -12,6 +12,14 @@ const Parada = sequelize.define('Parada', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    latitud: {
+        type: DataTypes.DOUBLE,
+        allowNull: false
+    },
+    longitud: {
+        type: DataTypes.DOUBLE,
+        allowNull: false
+    },
     ruta: {
         type: DataTypes.INTEGER,
         allowNull: false

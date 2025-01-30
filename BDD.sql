@@ -3,6 +3,7 @@ CREATE DATABASE sistema_transporte;
 USE sistema_transporte;
 
 -- Tabla de Rutas
+CREATE DATABASE `sistema_transporte` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 CREATE TABLE rutas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre_ruta VARCHAR(100) NOT NULL,
@@ -16,7 +17,7 @@ CREATE TABLE paradas (
     id_ruta INT,
     nombre_parada VARCHAR(100) NOT NULL,
     orden_parada INT NOT NULL,
-    FOREIGN KEY (id_ruta) REFERENCES rutas(id)
+    FOREIGN KEY (ruta) REFERENCES rutas(id)
 );
 
 -- Tabla de Estudiantes

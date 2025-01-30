@@ -34,6 +34,9 @@ allEstudiantesRoutes(app);
 const allRutasRoutes = require('./routes/ruta.route');
 allRutasRoutes(app);
 
+const allRutaOptimaRoutes = require('./routes/rutaOptima.route');
+allRutaOptimaRoutes(app);
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });

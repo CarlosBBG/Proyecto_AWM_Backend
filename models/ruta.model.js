@@ -11,10 +11,6 @@ const Ruta = sequelize.define('Ruta', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  recorrido: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
   asientos_disponibles: {
     type: DataTypes.INTEGER,
     defaultValue: 0

@@ -1,17 +1,29 @@
 const Estudiante = require('../models/estudiante.model');
 const Ruta = require('../models/ruta.model.js');
 const Parada = require('../models/parada.model.js');
+const bcrypt = require('bcryptjs');
 
 module.exports.createEstudiante = async (req, res) => {
     const { nombre, apellido, correo, password, codigoUnico, ruta, parada } = req.body;
     try {
-        const estudiante = await Estudiante.create({ nombre, apellido, correo, password, codigoUnico, ruta, parada });
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const estudiante = await Estudiante.create({ 
+            nombre, 
+            apellido, 
+            correo, 
+            password: hashedPassword, 
+            codigoUnico, 
+            ruta, 
+            parada 
+        });
+
         return res.status(201).json(estudiante);
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
-}
-
+};
 module.exports.getAllEstudiantes = async (req, res) => {
     try {
         const estudiantes = await Estudiante.findAll();
@@ -29,19 +41,26 @@ module.exports.updateEstudiante = async (req, res) => {
         if (!estudiante) {
             return res.status(404).json({ message: 'Estudiante no encontrado' });
         }
+
         estudiante.nombre = nombre;
         estudiante.apellido = apellido;
         estudiante.correo = correo;
-        estudiante.password = password;
         estudiante.codigoUnico = codigoUnico;
         estudiante.ruta = ruta;
         estudiante.parada = parada;
+
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            estudiante.password = await bcrypt.hash(password, salt);
+        }
+
         await estudiante.save();
         return res.status(200).json(estudiante);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
-}
+};
+
 
 module.exports.getEstudiante = async (req, res) => {
     const { id } = req.params;
@@ -250,5 +269,25 @@ module.exports.verificarParadasEstudiantes = async (req, res) => {
         }
     } catch (error) {
         console.error('Error al verificar paradas y ajustar asientos:', error);
+    }
+};
+
+// Verificación de contraseña para autenticación
+module.exports.verificarPassword = async (req, res) => {
+    const { correo, password } = req.body;
+    try {
+        const estudiante = await Estudiante.findOne({ where: { correo } });
+        if (!estudiante) {
+            return res.status(404).json({ message: 'Correo no registrado' });
+        }
+
+        const isMatch = await bcrypt.compare(password, estudiante.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Contraseña incorrecta' });
+        }
+
+        return res.status(200).json({ message: 'Autenticación exitosa' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 };

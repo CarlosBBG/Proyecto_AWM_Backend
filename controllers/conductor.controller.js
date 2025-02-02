@@ -1,11 +1,23 @@
 const Conductor = require('../models/conductor.model.js');
 const Ruta = require('../models/ruta.model.js');
 const Parada = require('../models/parada.model.js');
+const bcrypt = require('bcryptjs');
 
 module.exports.createConductor = async (req, res) => {
     const { nombre, apellido, correo, password, cedula, ruta } = req.body;
     try {
-        const conductor = await Conductor.create({ nombre, apellido, correo, password, cedula, ruta });
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const conductor = await Conductor.create({ 
+            nombre, 
+            apellido, 
+            correo, 
+            password: hashedPassword, 
+            cedula, 
+            ruta 
+        });
+
         return res.status(201).json(conductor);
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -29,19 +41,24 @@ module.exports.updateConductor = async (req, res) => {
         if (!conductor) {
             return res.status(404).json({ message: 'Conductor no encontrado' });
         }
+
         conductor.nombre = nombre;
         conductor.apellido = apellido;
         conductor.correo = correo;
-        conductor.password = password;
         conductor.cedula = cedula;
         conductor.ruta = ruta;
+
+        if (password && password.trim() !== '') {
+            const salt = await bcrypt.genSalt(10);
+            conductor.password = await bcrypt.hash(password, salt);
+        }
+
         await conductor.save();
         return res.status(200).json(conductor);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
-
 module.exports.getConductor = async (req, res) => {
     const { id } = req.params;
     try {
@@ -124,3 +141,22 @@ module.exports.getParadasConductor = async (req, res) => {
     }
 };
 
+// Verificación de contraseña para autenticación
+module.exports.verificarPassword = async (req, res) => {
+    const { correo, password } = req.body;
+    try {
+        const conductor = await Conductor.findOne({ where: { correo } });
+        if (!conductor) {
+            return res.status(404).json({ message: 'Correo no registrado' });
+        }
+
+        const isMatch = await bcrypt.compare(password, conductor.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Contraseña incorrecta' });
+        }
+
+        return res.status(200).json({ message: 'Autenticación exitosa' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};

@@ -31,7 +31,8 @@ const Parada = sequelize.define('Parada', {
 
 Ruta.hasMany(Parada, {
     foreignKey: 'ruta',
-    as: 'paradas'
+    as: 'paradas',
+    onDelete: 'CASCADE'
 });
 
 Parada.belongsTo(Ruta, {

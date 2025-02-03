@@ -59,6 +59,22 @@ module.exports.updateConductor = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+module.exports.deleteConductor = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const conductor = await Conductor.findByPk(id);
+        if (!conductor) {
+            return res.status(404).json({ message: 'Conductor no encontrado' });
+        }
+
+        await conductor.destroy();
+        return res.status(200).json({ message: 'Conductor eliminado con éxito' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports.getConductor = async (req, res) => {
     const { id } = req.params;
     try {

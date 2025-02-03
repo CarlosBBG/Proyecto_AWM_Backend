@@ -134,6 +134,21 @@ module.exports.updateRutaEstudiante = async (req, res) => {
     }
 };
 
+module.exports.deleteEstudiante = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const estudiante = await Estudiante.findByPk(id);
+        if (!estudiante) {
+            return res.status(404).json({ message: 'Estudiante no encontrado' });
+        }
+        await estudiante.destroy();
+
+        return res.status(200).json({ message: 'Estudiante eliminado correctamente' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 
 //Actualizar la parada de un estudiante
 module.exports.updateParadaEstudiante = async (req, res) => {

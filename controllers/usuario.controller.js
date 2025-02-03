@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { Administrador, Conductor, Estudiante } = require('../models');
 
-const generarToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || "password_secreto", {
+const generarToken = (id, role) => {
+    return jwt.sign({ id, role }, process.env.JWT_SECRET || "password_secreto", {
         expiresIn: '1d'
     });
 };
@@ -54,7 +54,7 @@ module.exports.login = async (req, res) => {
         return res.status(200).json({
             ...userWithoutPassword,
             role,  // Agregar el rol en la respuesta
-            token: generarToken(user.id),
+            token: generarToken(user.id, role), // Pasar el rol al generar el token
         });
 
     } catch (error) {

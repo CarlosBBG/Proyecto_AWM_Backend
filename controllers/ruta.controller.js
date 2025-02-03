@@ -4,7 +4,7 @@ const Parada = require('../models/parada.model');
 module.exports.getRutasConParadas = async (req, res) => {
     try {
         const rutas = await Ruta.findAll({
-            attributes: ['id', 'nombre'], // Solo obtenemos estos atributos de Rutas
+            attributes: ['id', 'nombre', 'asientos_disponibles'], // Solo obtenemos estos atributos de Rutas
             include: [{
                 model: Parada,
                 as: 'paradas',
@@ -23,7 +23,7 @@ module.exports.getRuta = async (req, res) => {
     const { id } = req.params;
     try {
         const ruta = await Ruta.findByPk(id, {
-            attributes: ['id', 'nombre'],
+            attributes: ['id', 'nombre', 'asientos_disponibles'],
             include: [{
                 model: Parada,
                 as: 'paradas',

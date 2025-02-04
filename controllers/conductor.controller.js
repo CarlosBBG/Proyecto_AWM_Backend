@@ -3,6 +3,55 @@ const Ruta = require('../models/ruta.model.js');
 const Parada = require('../models/parada.model.js');
 const bcrypt = require('bcryptjs');
 
+// 🔹 Estado global de rutas activas
+let rutasActivas = {};
+
+// 🟢 **Iniciar ruta (emitir evento WebSockets)**
+module.exports.iniciarRuta = (io, req, res) => {
+  const { rutaId, paradas } = req.body;
+  
+  console.log(`🚍 Conductor inició la ruta ${rutaId}.`);
+
+  rutasActivas[rutaId] = { paradasRecorridas: [], paradas };
+  io.emit(`ruta-${rutaId}`, rutasActivas[rutaId]); // Notificar a estudiantes
+
+  res.json({ mensaje: "Ruta iniciada correctamente." });
+};
+
+// 🔄 **Actualizar parada (emitir evento WebSockets)**
+module.exports.actualizarParada = (io, req, res) => {
+  const { rutaId, parada } = req.body;
+
+  if (!rutasActivas[rutaId]) {
+    return res.status(400).json({ mensaje: "Ruta no iniciada" });
+  }
+
+  rutasActivas[rutaId].paradasRecorridas.push(parada);
+  console.log(`📍 Parada agregada: ${parada} en la ruta ${rutaId}`);
+  
+  io.emit(`ruta-${rutaId}`, rutasActivas[rutaId]); // Notificar a estudiantes
+
+  res.json({ mensaje: "Parada actualizada correctamente." });
+};
+
+// 🏁 **Finalizar ruta (emitir evento WebSockets)**
+module.exports.terminarRuta = (io, req, res) => {
+  const { rutaId } = req.body;
+
+  if (!rutasActivas[rutaId]) {
+    return res.status(400).json({ mensaje: "Ruta no iniciada" });
+  }
+
+  console.log(`🏁 Ruta ${rutaId} finalizada.`);
+  delete rutasActivas[rutaId];
+
+  io.emit(`ruta-${rutaId}-finalizada`, { mensaje: "🚏 La ruta ha finalizado." });
+
+  res.json({ mensaje: "Ruta finalizada correctamente." });
+};
+
+// 🔹 Mantenemos el resto de las funciones sin cambios
+
 module.exports.createConductor = async (req, res) => {
     const { nombre, apellido, correo, password, cedula, ruta } = req.body;
     try {
